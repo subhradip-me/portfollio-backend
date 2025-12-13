@@ -73,11 +73,100 @@ portfollio-backend/
 └── package.json
 ```
 
-## 🔧 Scripts
+## � Deployment
+
+### Deploy to Render (Recommended)
+
+1. **Database Setup**
+   - Create a MongoDB Atlas account (free tier available)
+   - Create a cluster and get connection string
+   - Format: `mongodb+srv://username:password@cluster.mongodb.net/portfolio`
+
+2. **Render Configuration**
+   - Connect your GitHub repository to Render
+   - Create a Web Service
+   - Set Environment Variables in Render Dashboard:
+
+   ```env
+   NODE_ENV=production
+   PORT=5000
+   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/portfolio
+   JWT_SECRET=your-super-secret-jwt-key-here-make-it-very-long-and-secure
+   JWT_EXPIRE=7d
+   ```
+
+3. **Build Command**: `npm install`
+4. **Start Command**: `npm start`
+
+### Deploy to Railway (Alternative)
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Login and deploy
+railway login
+railway init
+railway up
+```
+
+### Deploy to Heroku (Alternative)
+```bash
+# Install Heroku CLI
+heroku create portfollio-backend
+heroku config:set NODE_ENV=production
+heroku config:set MONGODB_URI=your-mongodb-uri
+heroku config:set JWT_SECRET=your-jwt-secret
+git push heroku main
+```
+
+## 🔧 Environment Variables
+
+Required environment variables for deployment:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `NODE_ENV` | Environment mode | `production` |
+| `PORT` | Server port | `5000` |
+| `MONGODB_URI` | MongoDB connection string | `mongodb+srv://...` |
+| `JWT_SECRET` | JWT signing secret | `super-secret-key` |
+| `JWT_EXPIRE` | JWT expiration time | `7d` |
+
+## �🔧 Scripts
 
 - `npm start` - Start production server
 - `npm run dev` - Start development server with nodemon
 - `npm test` - Run tests
+
+## 🔍 Troubleshooting
+
+### MongoDB Connection Issues
+
+**Error: `connect ECONNREFUSED 127.0.0.1:27017`**
+- Solution: Set `MONGODB_URI` environment variable to MongoDB Atlas connection string
+- Local MongoDB not available on hosting platforms like Render/Heroku
+
+**Error: `MongoNetworkError`**
+- Check MongoDB Atlas network access (allow all IPs: 0.0.0.0/0)
+- Verify connection string format and credentials
+
+### CORS Errors
+
+**Error: `blocked by CORS policy`**
+- Ensure frontend domain is added to CORS origins in `index.js`
+- Check environment variable `NODE_ENV` is set correctly
+
+### Environment Variables
+
+**Error: `JWT_SECRET is not defined`**
+- Set all required environment variables in hosting platform dashboard
+- Never commit `.env` files to repository
+
+### Deployment Issues
+
+**Build succeeds but crashes on start:**
+- Check environment variables are set correctly
+- Verify MongoDB connection string
+- Check server logs for specific error messages
 
 ---
 

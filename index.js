@@ -53,8 +53,17 @@ app.use(limiter);
 // CORS configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://portfollio-design-lte6ycmym-subhradip-mes-projects.vercel.app/'] 
-    : ['http://subhradip.me/',],
+    ? [
+        'https://portfollio-design-lte6ycmym-subhradip-mes-projects.vercel.app',
+        'https://portfollio-design.vercel.app',
+        'https://subhradip.me',
+        'http://subhradip.me'
+      ] 
+    : [
+        'http://localhost:5174',
+        'http://localhost:5173',
+        'http://localhost:3000'
+      ],
   credentials: true
 }));
 
