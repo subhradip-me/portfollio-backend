@@ -1,0 +1,37 @@
+[
+  {
+    "id": "ecfed264-ad80-4c65-8044-65c920ce4450",
+    "title": "E-Commerce Platform",
+    "subtitle": "Full Stack Web Application",
+    "description": "A modern e-commerce platform built with React and Node.js featuring real-time inventory management, secure payments, and responsive design.",
+    "tech": [
+      "React",
+      "Node.js",
+      "MongoDB",
+      "Stripe",
+      "Socket.io"
+    ],
+    "year": "2024",
+    "featured": true,
+    "thumbnailUrl": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600",
+    "createdAt": "2025-12-12T09:30:59.697Z",
+    "updatedAt": "2025-12-12T09:30:59.697Z"
+  },
+  {
+    "id": "2e4115d4-d8ef-4945-94b6-f829c5fe6c64",
+    "title": "Task Management App",
+    "subtitle": "Productivity Tool",
+    "description": "A collaborative task management application with drag-and-drop functionality, real-time updates, and team collaboration features.",
+    "tech": [
+      "React",
+      "Firebase",
+      "Material-UI",
+      "TypeScript"
+    ],
+    "year": "2024",
+    "featured": false,
+    "thumbnailUrl": "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=600",
+    "createdAt": "2025-12-12T09:30:59.697Z",
+    "updatedAt": "2025-12-12T09:30:59.697Z"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "b00bb4f7-5905-4ca3-8d54-4a63bcb9da4f",
+    "name": "Sarah Johnson",
+    "position": "CEO",
+    "company": "TechStart Inc.",
+    "message": "Outstanding work! The project was delivered on time and exceeded all our expectations. The attention to detail and technical expertise shown throughout the development process was remarkable.",
+    "rating": 5,
+    "featured": true,
+    "avatarUrl": "https://images.unsplash.com/photo-1494790108755-2616b612b587?w=150",
+    "createdAt": "2025-12-12T09:30:59.698Z",
+    "updatedAt": "2025-12-12T09:30:59.698Z"
+  },
+  {
+    "id": "4a00dcc7-29b8-48f8-8a80-9b00d9643b26",
+    "name": "Michael Chen",
+    "position": "Product Manager",
+    "company": "InnovateLab",
+    "message": "Professional, efficient, and creative. The final product perfectly aligned with our vision and business goals. Highly recommended for any development project.",
+    "rating": 5,
+    "featured": true,
+    "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+    "createdAt": "2025-12-12T09:30:59.698Z",
+    "updatedAt": "2025-12-12T09:30:59.698Z"
+  }
+]
