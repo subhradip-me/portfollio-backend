@@ -185,7 +185,7 @@ export const deleteTestimonial = asyncHandler(async (req, res) => {
 });
 
 // @desc    Toggle featured status
-// @route   PATCH /api/testimonials/:id/featured
+// @route   PATCH /api/testimonials/:id/toggle-featured
 // @access  Private/Admin
 export const toggleFeatured = asyncHandler(async (req, res) => {
   const testimonial = await Testimonial.findById(req.params.id);
@@ -195,20 +195,14 @@ export const toggleFeatured = asyncHandler(async (req, res) => {
     throw new Error('Testimonial not found');
   }
 
-  const { featured } = req.body;
-  
-  if (typeof featured !== 'boolean') {
-    res.status(400);
-    throw new Error('Featured must be a boolean value');
-  }
-
-  testimonial.featured = featured;
+  // Toggle the featured status
+  testimonial.featured = !testimonial.featured;
   testimonial.updatedBy = req.user.id;
   await testimonial.save();
 
   res.json({
     success: true,
-    message: 'Testimonial featured status updated successfully',
+    message: `Testimonial ${testimonial.featured ? 'marked as featured' : 'unmarked as featured'} successfully`,
     testimonial
   });
 });
@@ -347,12 +341,53 @@ export const getTestimonialsByCompany = asyncHandler(async (req, res) => {
 });
 
 // @desc    Get testimonial statistics
-// @route   GET /api/testimonials/stats/summary
+// @route   GET /api/testimonials/statistics
 // @access  Private/Admin
 export const getTestimonialStats = asyncHandler(async (req, res) => {
-  const stats = await Testimonial.getStats();
-  const ratingDistribution = await Testimonial.getRatingDistribution();
-  const topCompanies = await Testimonial.getTopCompanies(5);
+  const stats = await Testimonial.aggregate([
+    {
+      $facet: {
+        totalStats: [
+          {
+            $group: {
+              _id: null,
+              totalTestimonials: { $sum: 1 },
+              approvedTestimonials: {
+                $sum: { $cond: [{ $eq: ['$status', 'approved'] }, 1, 0] }
+              },
+              pendingTestimonials: {
+                $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] }
+              },
+              featuredTestimonials: {
+                $sum: { $cond: ['$featured', 1, 0] }
+              },
+              averageRating: { $avg: '$rating' }
+            }
+          }
+        ],
+        ratingDistribution: [
+          {
+            $group: {
+              _id: '$rating',
+              count: { $sum: 1 }
+            }
+          },
+          { $sort: { _id: 1 } }
+        ],
+        companyDistribution: [
+          { $match: { company: { $exists: true, $ne: '' } } },
+          {
+            $group: {
+              _id: '$company',
+              count: { $sum: 1 }
+            }
+          },
+          { $sort: { count: -1 } },
+          { $limit: 10 }
+        ]
+      }
+    }
+  ]);
 
   // Get recent testimonials
   const recentTestimonials = await Testimonial.find({ status: 'approved' })
@@ -360,17 +395,22 @@ export const getTestimonialStats = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(5);
 
-  // Get pending testimonials count
-  const pendingCount = await Testimonial.countDocuments({ status: 'pending' });
+  const result = stats[0];
+  const totalStats = result.totalStats[0] || {
+    totalTestimonials: 0,
+    approvedTestimonials: 0,
+    pendingTestimonials: 0,
+    featuredTestimonials: 0,
+    averageRating: 0
+  };
 
   res.json({
     success: true,
     stats: {
-      ...stats[0],
-      ratingDistribution,
-      topCompanies,
-      recentTestimonials,
-      pendingCount
+      ...totalStats,
+      ratingDistribution: result.ratingDistribution,
+      companyDistribution: result.companyDistribution,
+      recentTestimonials
     }
   });
 });

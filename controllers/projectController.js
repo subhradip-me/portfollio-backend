@@ -197,7 +197,7 @@ export const deleteProject = asyncHandler(async (req, res) => {
 });
 
 // @desc    Toggle featured status
-// @route   PATCH /api/projects/:id/featured
+// @route   PATCH /api/projects/:id/toggle-featured
 // @access  Private/Admin
 export const toggleFeatured = asyncHandler(async (req, res) => {
   const project = await Project.findById(req.params.id);
@@ -207,20 +207,16 @@ export const toggleFeatured = asyncHandler(async (req, res) => {
     throw new Error('Project not found');
   }
 
-  const { featured } = req.body;
-  
-  if (typeof featured !== 'boolean') {
-    res.status(400);
-    throw new Error('Featured must be a boolean value');
-  }
-
-  project.featured = featured;
+  // Toggle the featured status
+  project.featured = !project.featured;
   project.updatedBy = req.user.id;
   await project.save();
 
+  await project.populate('createdBy updatedBy', 'username email');
+
   res.json({
     success: true,
-    message: 'Project featured status updated successfully',
+    message: `Project ${project.featured ? 'marked as featured' : 'unmarked as featured'} successfully`,
     project
   });
 });
@@ -303,35 +299,52 @@ export const getProjectsByTechnology = asyncHandler(async (req, res) => {
 });
 
 // @desc    Get project statistics
-// @route   GET /api/projects/stats/summary
-// @access  Private/Admin
+// @route   GET /api/projects/statistics
+// @access  Public
 export const getProjectStats = asyncHandler(async (req, res) => {
-  const stats = await Project.getStats();
-  
-  // Get year distribution
-  const yearDistribution = await Project.aggregate([
-    { $match: { status: 'published' } },
+  const stats = await Project.aggregate([
     {
-      $group: {
-        _id: '$year',
-        count: { $sum: 1 }
+      $facet: {
+        totalStats: [
+          {
+            $match: { status: 'published' }
+          },
+          {
+            $group: {
+              _id: null,
+              totalProjects: { $sum: 1 },
+              totalViews: { $sum: '$viewCount' },
+              featuredProjects: {
+                $sum: { $cond: ['$featured', 1, 0] }
+              },
+              averageViews: { $avg: '$viewCount' }
+            }
+          }
+        ],
+        yearDistribution: [
+          { $match: { status: 'published' } },
+          {
+            $group: {
+              _id: '$year',
+              count: { $sum: 1 }
+            }
+          },
+          { $sort: { _id: -1 } }
+        ],
+        techDistribution: [
+          { $match: { status: 'published' } },
+          { $unwind: '$technologies' },
+          {
+            $group: {
+              _id: '$technologies',
+              count: { $sum: 1 }
+            }
+          },
+          { $sort: { count: -1 } },
+          { $limit: 10 }
+        ]
       }
-    },
-    { $sort: { _id: -1 } }
-  ]);
-
-  // Get technology distribution
-  const techDistribution = await Project.aggregate([
-    { $match: { status: 'published' } },
-    { $unwind: '$technologies' },
-    {
-      $group: {
-        _id: '$technologies',
-        count: { $sum: 1 }
-      }
-    },
-    { $sort: { count: -1 } },
-    { $limit: 10 }
+    }
   ]);
 
   // Get recent projects
@@ -340,12 +353,20 @@ export const getProjectStats = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(5);
 
+  const result = stats[0];
+  const totalStats = result.totalStats[0] || {
+    totalProjects: 0,
+    totalViews: 0,
+    featuredProjects: 0,
+    averageViews: 0
+  };
+
   res.json({
     success: true,
     stats: {
-      ...stats[0],
-      yearDistribution,
-      techDistribution,
+      ...totalStats,
+      yearDistribution: result.yearDistribution,
+      techDistribution: result.techDistribution,
       recentProjects
     }
   });

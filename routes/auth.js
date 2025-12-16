@@ -10,7 +10,12 @@ import {
   getUsers 
 } from '../controllers/authController.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
-import { validateLogin, validateRegister } from '../middleware/validation.js';
+import { 
+  validateLogin, 
+  validateRegister, 
+  validateChangePassword, 
+  validateUpdateProfile 
+} from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -32,8 +37,8 @@ router.post('/register', authLimiter, validateRegister, register);
 
 // Protected routes
 router.get('/me', authenticateToken, getProfile);
-router.put('/profile', authenticateToken, updateProfile);
-router.put('/change-password', authenticateToken, changePassword);
+router.put('/profile', authenticateToken, validateUpdateProfile, updateProfile);
+router.put('/change-password', authenticateToken, validateChangePassword, changePassword);
 router.post('/logout', authenticateToken, logout);
 
 // Admin only routes
