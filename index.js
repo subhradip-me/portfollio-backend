@@ -56,6 +56,7 @@ app.use(cors({
     ? [
         'https://portfollio-design-lte6ycmym-subhradip-mes-projects.vercel.app',
         'https://portfollio-design.vercel.app',
+        'https://www.subhradip.me',
         'https://subhradip.me',
         'http://subhradip.me'
       ] 
