@@ -61,9 +61,6 @@ export const getTestimonials = asyncHandler(async (req, res) => {
 
   // Execute query with pagination
   const testimonials = await Testimonial.find(query)
-    .populate('createdBy', 'username email')
-    .populate('updatedBy', 'username email')
-    .populate('projectId', 'title')
     .sort(sort)
     .limit(limit * 1)
     .skip((page - 1) * limit);
@@ -86,10 +83,7 @@ export const getTestimonials = asyncHandler(async (req, res) => {
 // @route   GET /api/testimonials/:id
 // @access  Public
 export const getTestimonial = asyncHandler(async (req, res) => {
-  const testimonial = await Testimonial.findById(req.params.id)
-    .populate('createdBy', 'username email')
-    .populate('updatedBy', 'username email')
-    .populate('projectId', 'title');
+  const testimonial = await Testimonial.findById(req.params.id);
 
   if (!testimonial) {
     res.status(404);
@@ -124,9 +118,6 @@ export const createTestimonial = asyncHandler(async (req, res) => {
   }
 
   const testimonial = await Testimonial.create(testimonialData);
-
-  // Populate creator info
-  await testimonial.populate('createdBy', 'username email');
 
   res.status(201).json({
     success: true,
@@ -164,7 +155,7 @@ export const updateTestimonial = asyncHandler(async (req, res) => {
     req.params.id,
     updateData,
     { new: true, runValidators: true }
-  ).populate('createdBy updatedBy', 'username email');
+  );
 
   res.json({
     success: true,
@@ -272,9 +263,7 @@ export const rejectTestimonial = asyncHandler(async (req, res) => {
 export const getFeaturedTestimonials = asyncHandler(async (req, res) => {
   const { limit = 6 } = req.query;
 
-  const testimonials = await Testimonial.findFeatured()
-    .populate('createdBy', 'username email')
-    .populate('projectId', 'title')
+  const testimonials = await Testimonial.find({ featured: true, status: 'approved' })
     .sort({ updatedAt: -1 })
     .limit(parseInt(limit));
 
@@ -298,9 +287,10 @@ export const getTestimonialsByRating = asyncHandler(async (req, res) => {
     throw new Error('Invalid rating. Must be between 1 and 5');
   }
 
-  const testimonials = await Testimonial.findByRating(minRating)
-    .populate('createdBy', 'username email')
-    .populate('projectId', 'title')
+  const testimonials = await Testimonial.find({ 
+    rating: { $gte: minRating },
+    status: 'approved' 
+  })
     .sort({ createdAt: -1 })
     .limit(limit * 1)
     .skip((page - 1) * limit);
@@ -330,9 +320,10 @@ export const getTestimonialsByCompany = asyncHandler(async (req, res) => {
   const { company } = req.params;
   const { limit = 10, page = 1 } = req.query;
 
-  const testimonials = await Testimonial.findByCompany(company)
-    .populate('createdBy', 'username email')
-    .populate('projectId', 'title')
+  const testimonials = await Testimonial.find({ 
+    company: new RegExp(company, 'i'),
+    status: 'approved' 
+  })
     .sort({ createdAt: -1 })
     .limit(limit * 1)
     .skip((page - 1) * limit);
