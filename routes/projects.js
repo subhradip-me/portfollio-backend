@@ -8,7 +8,8 @@ import {
   toggleFeatured,
   getProjectsByTechnology,
   getProjectsByYear,
-  getProjectStats
+  getProjectStats,
+  getFeaturedProjects
 } from '../controllers/projectController.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 import { validateProject } from '../middleware/validation.js';
@@ -17,6 +18,7 @@ const router = express.Router();
 
 // Public routes
 router.get('/', getProjects);
+router.get('/featured', getFeaturedProjects);
 router.get('/statistics', getProjectStats);
 router.get('/technology/:tech', getProjectsByTechnology);
 router.get('/year/:year', getProjectsByYear);

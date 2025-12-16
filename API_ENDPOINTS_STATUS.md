@@ -28,6 +28,7 @@ All endpoints return JSON responses with a `success` field indicating the operat
 | Method | Endpoint | Access | Description | Validation |
 |--------|----------|--------|-------------|-------------|
 | `GET` | `/api/projects` | Public | Get all projects with pagination, filtering | Query params |
+| `GET` | `/api/projects/featured` | Public | Get featured projects | Query params |
 | `POST` | `/api/projects` | Protected (Admin) | Create new project | `validateProject` |
 | `GET` | `/api/projects/:id` | Public | Get single project by ID | - |
 | `PUT` | `/api/projects/:id` | Protected (Admin) | Update project | `validateProject` |
@@ -45,6 +46,7 @@ All endpoints return JSON responses with a `success` field indicating the operat
 - **View Counting**: Automatic view increment for published projects
 - **Technology Filtering**: Case-insensitive regex search
 - **Year Filtering**: Projects by completion year
+- **Featured Projects**: Dedicated endpoint for featured projects with limit control
 - **Featured Toggle**: Admin can toggle featured status
 - **Statistics**: Comprehensive project analytics
 
