@@ -1,24 +1,57 @@
 # 🚀 Portfolio Backend API
 
-RESTful API backend for the portfolio admin dashboard built with Express.js and MongoDB.
+Production-ready RESTful API backend for the portfolio admin dashboard built with Express.js and MongoDB.
+
+## 🌐 Live API
+**Production URL**: https://portfollio-backend-2-85n5.onrender.com/api
+**Health Check**: https://portfollio-backend-2-85n5.onrender.com/api/health
 
 ## ✨ Features
 
-- 🔐 **JWT Authentication** - Secure admin authentication
-- 📁 **Projects Management** - CRUD operations for portfolio projects
-- 💬 **Testimonials** - Manage client testimonials
-- 🛡️ **Security** - Rate limiting, CORS, input validation
-- 📊 **Analytics** - Dashboard statistics and metrics
+- 🔐 **JWT Authentication** - Secure admin authentication with bcrypt
+- 📁 **Projects Management** - Full CRUD operations for portfolio projects
+- 💬 **Testimonials** - Complete testimonials management system
+- 🛡️ **Security** - Rate limiting, CORS, Helmet security headers, input validation
+- 📊 **Dashboard Analytics** - Project and testimonial statistics
+- 🚀 **Production Ready** - Deployed on Render with MongoDB Atlas
 
 ## 🛠️ Tech Stack
 
-- **Express.js** - Web framework
-- **MongoDB** - Database
-- **Mongoose** - ODM
-- **JWT** - Authentication
-- **bcrypt** - Password hashing
+- **Express.js 5.2.1** - Web framework
+- **MongoDB Atlas** - Cloud database
+- **Mongoose 8.8.3** - MongoDB ODM
+- **JWT** - Secure authentication tokens
+- **bcryptjs** - Password hashing and security
 
-## 🚦 Quick Start
+## � Production Environment
+
+**Currently Deployed**: ✅ Render Platform
+- **API URL**: https://portfollio-backend-2-85n5.onrender.com/api
+- **Database**: MongoDB Atlas
+- **Authentication**: JWT with 24h expiration
+- **Security**: CORS configured for frontend domains, rate limiting, helmet security
+
+### Environment Variables
+```env
+NODE_ENV=production
+PORT=5000
+MONGODB_URI=mongodb+srv://...
+JWT_SECRET=secure-production-secret
+JWT_EXPIRES_IN=24h
+BCRYPT_SALT_ROUNDS=12
+```
+
+### CORS Configuration
+Production domains whitelisted:
+- `https://www.subhradip.me`
+- `https://subhradip.me`
+- `https://portfollio-design.vercel.app`
+
+## 🚦 Local Development Setup
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
 
 ### Installation
 ```bash
@@ -30,9 +63,10 @@ Create `.env` file:
 ```env
 NODE_ENV=development
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/portfolio
-JWT_SECRET=your-super-secret-key
-JWT_EXPIRE=7d
+MONGODB_URI=mongodb+srv://your-atlas-connection-string
+JWT_SECRET=your-super-secret-key-minimum-32-characters
+JWT_EXPIRES_IN=24h
+BCRYPT_SALT_ROUNDS=12
 ```
 
 ### Start Development Server
@@ -40,83 +74,123 @@ JWT_EXPIRE=7d
 npm run dev
 ```
 
+### Verify Setup
+- Health check: http://localhost:5000/api/health
+- Check console for MongoDB connection confirmation
+
 ## 📚 API Endpoints
 
+### Base URL
+- **Production**: https://portfollio-backend-2-85n5.onrender.com/api
+- **Development**: http://localhost:5000/api
+
+### Health Check
+- `GET /api/health` - API health status and database connection
+
 ### Authentication
-- `POST /api/auth/register` - Register admin
-- `POST /api/auth/login` - Login admin
-- `GET /api/auth/profile` - Get profile (protected)
+- `POST /api/auth/register` - Register admin account
+- `POST /api/auth/login` - Login admin and get JWT token
+- `GET /api/auth/me` - Get current user profile (protected)
+- `PUT /api/auth/profile` - Update user profile (protected)
+- `PUT /api/auth/change-password` - Change password (protected)
 
 ### Projects
-- `GET /api/projects` - Get all projects
-- `POST /api/projects` - Create project (protected)
-- `GET /api/projects/:id` - Get project by ID
+- `GET /api/projects` - Get all projects (public with pagination, filtering)
+- `POST /api/projects` - Create new project (protected)
+- `GET /api/projects/:id` - Get single project by ID (public)
 - `PUT /api/projects/:id` - Update project (protected)
+- `PATCH /api/projects/:id/toggle-featured` - Toggle featured status (protected)
 - `DELETE /api/projects/:id` - Delete project (protected)
+- `GET /api/projects/technology/:tech` - Get projects by technology (public)
+- `GET /api/projects/year/:year` - Get projects by year (public)
+- `GET /api/projects/statistics` - Get project statistics (public)
 
 ### Testimonials
-- `GET /api/testimonials` - Get testimonials
+- `GET /api/testimonials/featured` - Get featured testimonials (public)
+- `GET /api/testimonials` - Get all testimonials (protected, admin only)
 - `POST /api/testimonials` - Create testimonial (protected)
+- `GET /api/testimonials/:id` - Get single testimonial (public)
 - `PUT /api/testimonials/:id` - Update testimonial (protected)
+- `PATCH /api/testimonials/:id/approve` - Approve testimonial (protected)
 - `DELETE /api/testimonials/:id` - Delete testimonial (protected)
+- `GET /api/testimonials/rating/:rating` - Get testimonials by rating (public)
+- `GET /api/testimonials/statistics` - Get testimonial statistics (protected)
 
 ## 📁 Project Structure
 
 ```
 portfollio-backend/
-├── controllers/          # Route handlers
-├── middleware/           # Custom middleware
-├── models/              # MongoDB models
-├── routes/              # API routes
-├── utils/               # Utility functions
-├── index.js             # App entry point
-└── package.json
+├── index.js                    # Main server file with Express setup
+├── config/                     # Configuration files
+│   └── database.js            # MongoDB connection setup
+├── controllers/                # Route handlers and business logic
+│   ├── authController.js      # Authentication & user management
+│   ├── projectController.js   # Projects CRUD operations
+│   └── testimonialController.js # Testimonials management
+├── middleware/                 # Custom Express middleware
+│   ├── auth.js                # JWT authentication middleware
+│   └── validation.js          # Input validation rules
+├── models/                     # Mongoose data models
+│   ├── User.js                # User schema (admin accounts)
+│   ├── Project.js             # Project schema with validations
+│   └── Testimonial.js         # Testimonial schema
+├── routes/                     # API route definitions
+│   ├── auth.js                # Authentication routes
+│   ├── projects.js            # Projects API routes
+│   └── testimonials.js        # Testimonials API routes
+├── uploads/                    # File upload directory
+├── .env                        # Environment variables
+└── package.json               # Dependencies and scripts
 ```
 
-## � Deployment
+## 🚀 Deployment Guide
 
-### Deploy to Render (Recommended)
+### Current Production Status
+✅ **Deployed on Render**: https://portfollio-backend-2-85n5.onrender.com/api
+✅ **Database**: MongoDB Atlas
+✅ **Security**: Production-ready with CORS, rate limiting, and JWT
 
-1. **Database Setup**
-   - Create a MongoDB Atlas account (free tier available)
-   - Create a cluster and get connection string
-   - Format: `mongodb+srv://username:password@cluster.mongodb.net/portfolio`
+### Deploy to Render (Current Setup)
+
+1. **Prerequisites**
+   - MongoDB Atlas cluster (free tier)
+   - GitHub repository
+   - Render account
 
 2. **Render Configuration**
-   - Connect your GitHub repository to Render
-   - Create a Web Service
-   - Set Environment Variables in Render Dashboard:
-
+   - Service Type: Web Service
+   - Build Command: `npm install`
+   - Start Command: `npm start`
+   - Environment Variables:
    ```env
    NODE_ENV=production
    PORT=5000
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/portfolio
-   JWT_SECRET=your-super-secret-jwt-key-here-make-it-very-long-and-secure
-   JWT_EXPIRE=7d
+   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/portfollio
+   JWT_SECRET=your-super-secure-production-secret-minimum-32-chars
+   JWT_EXPIRES_IN=24h
+   BCRYPT_SALT_ROUNDS=12
    ```
 
-3. **Build Command**: `npm install`
-4. **Start Command**: `npm start`
+3. **MongoDB Atlas Setup**
+   - Create free cluster
+   - Add database user with read/write permissions
+   - Whitelist all IPs (0.0.0.0/0) for Render
+   - Get connection string for MONGODB_URI
 
-### Deploy to Railway (Alternative)
+### Alternative Deployment Options
+
+#### Railway
 ```bash
-# Install Railway CLI
 npm install -g @railway/cli
-
-# Login and deploy
 railway login
 railway init
 railway up
 ```
 
-### Deploy to Heroku (Alternative)
+#### Vercel (Serverless)
 ```bash
-# Install Heroku CLI
-heroku create portfollio-backend
-heroku config:set NODE_ENV=production
-heroku config:set MONGODB_URI=your-mongodb-uri
-heroku config:set JWT_SECRET=your-jwt-secret
-git push heroku main
+npm install -g vercel
+vercel --prod
 ```
 
 ## 🔧 Environment Variables
@@ -133,9 +207,62 @@ Required environment variables for deployment:
 
 ## �🔧 Scripts
 
+## 🔒 Security Features
+
+### Production Security
+- **Rate Limiting**: 100 requests/15min (general), 5 requests/15min (auth routes)
+- **CORS**: Restricted to whitelisted frontend domains
+- **Helmet**: Security headers, XSS protection, content security policy
+- **JWT Authentication**: Secure tokens with configurable expiration
+- **Password Security**: bcrypt hashing with salt rounds (12)
+- **Input Validation**: Comprehensive validation using express-validator
+- **Error Handling**: Secure error responses without sensitive data exposure
+
+### Environment Security
+```env
+# Strong JWT secret (production)
+JWT_SECRET=minimum-32-character-super-secure-production-secret-key
+
+# Secure MongoDB connection
+MONGODB_URI=mongodb+srv://username:strong-password@cluster.mongodb.net/portfollio
+
+# Production salt rounds
+BCRYPT_SALT_ROUNDS=12
+```
+
+## 🔧 Available Scripts
+
 - `npm start` - Start production server
 - `npm run dev` - Start development server with nodemon
-- `npm test` - Run tests
+- `npm test` - Run tests (placeholder)
+
+## 📊 API Response Format
+
+### Success Response
+```json
+{
+  "success": true,
+  "data": {
+    "projects": [...],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 5,
+      "totalItems": 25,
+      "itemsPerPage": 5
+    }
+  }
+}
+```
+
+### Error Response
+```json
+{
+  "success": false,
+  "error": "Resource not found",
+  "code": "NOT_FOUND",
+  "details": []
+}
+```
 
 ## 🔍 Troubleshooting
 
@@ -170,9 +297,23 @@ Required environment variables for deployment:
 
 ---
 
-**Frontend Repository**: [Portfolio Design](../portfollio-design)
+## 📚 Additional Resources
 
-Built with ❤️ using Node.js and Express
+- **Frontend Repository**: [portfollio-design](../portfollio-design)
+- **Live Portfolio**: https://www.subhradip.me
+- **API Documentation**: Available via endpoints above
+- **MongoDB Atlas**: https://mongodb.com/atlas
+- **Render Hosting**: https://render.com
+
+## 📄 License
+
+MIT License - Free to use for personal and commercial projects
+
+---
+
+**Built with ❤️ using Node.js, Express, and MongoDB**
+
+*Production ready • Secure • Scalable • Modern*
 
 - Node.js 16+ 
 - MongoDB 4.4+ (local installation or MongoDB Atlas)
@@ -613,35 +754,75 @@ backend/
    pm2 save
    ```
 
-## Connecting to Frontend
+## 🔗 Frontend Integration
 
-Update your React frontend to use the backend API:
-
+### API Configuration
 ```javascript
-const API_BASE = 'http://localhost:5000/api';
-
-// Example: Fetch projects
-const fetchProjects = async () => {
-  const response = await fetch(`${API_BASE}/projects`);
-  const data = await response.json();
-  return data.projects;
+// Frontend API configuration
+const API_CONFIG = {
+  BASE_URL: process.env.NODE_ENV === 'production' 
+    ? 'https://portfollio-backend-2-85n5.onrender.com/api'
+    : 'http://localhost:5000/api',
+  TIMEOUT: 10000
 };
 
-// Example: Login
-const login = async (email, password) => {
-  const response = await fetch(`${API_BASE}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  });
-  
-  const data = await response.json();
-  if (data.token) {
-    localStorage.setItem('token', data.token);
+// Axios instance setup
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: API_CONFIG.BASE_URL,
+  timeout: API_CONFIG.TIMEOUT,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add auth token to requests
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-  return data;
+  return config;
+});
+```
+
+### Example API Calls
+```javascript
+// Fetch projects
+const fetchProjects = async () => {
+  try {
+    const response = await api.get('/projects');
+    return response.data.projects;
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    throw error;
+  }
+};
+
+// Admin login
+const login = async (email, password) => {
+  try {
+    const response = await api.post('/auth/login', { email, password });
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
+};
+
+// Create project (protected)
+const createProject = async (projectData) => {
+  try {
+    const response = await api.post('/projects', projectData);
+    return response.data.project;
+  } catch (error) {
+    console.error('Error creating project:', error);
+    throw error;
+  }
 };
 ```
 
